@@ -82,14 +82,16 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  var timestamp = new Date().getUTCMilliseconds(); // dummy div id
+  var count = 0; // dummy div id
   return {
     addProfileItem: () => {
+      count++;
       dispatch({
         type: 'ADD_PROFILE_ITEM',
         newItem: {
-          id: timestamp,
+          id: 'new-profile-' + count,
           name: 'New Profile',
+          iconName: 'custom',
           class: 'profile-item custom active',
         },
       });

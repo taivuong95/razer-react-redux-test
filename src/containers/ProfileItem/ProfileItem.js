@@ -4,7 +4,10 @@ class ProfileItem extends Component {
   render() {
     return (
       <div
-        onClick={() => this.props.changeProfileItem()}
+        onClick={e => {
+          console.log(e.target);
+          this.props.changeProfileItem(e.target.id);
+        }}
         id={this.props.id}
         className={this.props.class}
       >
@@ -22,8 +25,11 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    changeProfileItem: () => {
-      dispatch({ type: 'CHANGE_PROFILE_ITEM' });
+    changeProfileItem: selectedItemContent => {
+      dispatch({
+        type: 'CHANGE_PROFILE_ITEM',
+        payload: selectedItemContent,
+      });
     },
   };
 };
