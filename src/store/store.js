@@ -2,6 +2,8 @@ var redux = require('redux');
 
 const profileListState = {
   selectedItemContent: 'Default',
+  isUp: false,
+  isDown: true,
   profileArr: [
     {
       id: 'profle1',
@@ -54,7 +56,7 @@ const reducer = (state = profileListState, action) => {
       let newActiveItem = cloneProfileArr.find(
         element => element.id.toUpperCase() === action.payload.toUpperCase()
       );
-      let newIndex = cloneProfileArr.findIndex(
+      let newActiveIndex = cloneProfileArr.findIndex(
         element => element.id.toUpperCase() === action.payload.toUpperCase()
       );
 
@@ -63,10 +65,15 @@ const reducer = (state = profileListState, action) => {
         class: newActiveItem.class + ' active',
       };
 
-      cloneProfileArr.splice(newIndex, 1, tempNewItem);
+      cloneProfileArr.splice(newActiveIndex, 1, tempNewItem);
 
       return {
         ...state,
+        isUp:
+          newActiveIndex > 0 && newActiveIndex <= cloneProfileArr.length
+            ? true
+            : false,
+        isDown: newActiveIndex < cloneProfileArr.length - 1 ? true : false,
         selectedItemContent: action.payload,
         profileArr: [...cloneProfileArr],
       };
@@ -84,6 +91,65 @@ const reducer = (state = profileListState, action) => {
       return {
         ...state,
         profileArr: [...newProfileArr, action.newItem],
+      };
+
+    case 'UP_PROFILE_ITEM':
+      console.log('UP PROFILE NE');
+      var updatedProfileArrAfterUp = [...state.profileArr];
+      let oldPosition = updatedProfileArrAfterUp.findIndex(element =>
+        element.class.includes('active')
+      );
+      let newPosition = oldPosition - 1;
+
+      if (newPosition >= 0 && newPosition <= updatedProfileArrAfterUp.length) {
+        // swap
+        [
+          updatedProfileArrAfterUp[oldPosition],
+          updatedProfileArrAfterUp[newPosition],
+        ] = [
+          updatedProfileArrAfterUp[newPosition],
+          updatedProfileArrAfterUp[oldPosition],
+        ];
+      }
+
+      return {
+        ...state,
+        isUp:
+          newPosition > 0 && newPosition <= updatedProfileArrAfterUp.length
+            ? true
+            : false,
+        isDown:
+          newPosition < updatedProfileArrAfterUp.length - 1 ? true : false,
+        profileArr: [...updatedProfileArrAfterUp],
+      };
+
+    case 'DOWN_PROFILE_ITEM':
+      console.log('DOWN PROFILE NE');
+      var updatedProfileArrAfterDown = [...state.profileArr];
+      let oldPos = updatedProfileArrAfterDown.findIndex(element =>
+        element.class.includes('active')
+      );
+      let newPos = oldPos + 1;
+
+      if (newPos <= updatedProfileArrAfterDown.length - 1) {
+        // // swap
+        [
+          updatedProfileArrAfterDown[oldPos],
+          updatedProfileArrAfterDown[newPos],
+        ] = [
+          updatedProfileArrAfterDown[newPos],
+          updatedProfileArrAfterDown[oldPos],
+        ];
+      }
+
+      return {
+        ...state,
+        isUp:
+          newPos > 0 && newPos <= updatedProfileArrAfterDown.length
+            ? true
+            : false,
+        isDown: newPos < updatedProfileArrAfterDown.length - 1 ? true : false,
+        profileArr: [...updatedProfileArrAfterDown],
       };
 
     default:

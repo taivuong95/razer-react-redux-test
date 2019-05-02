@@ -5,7 +5,6 @@ class ProfileItem extends Component {
     return (
       <div
         onClick={e => {
-          console.log(e.target);
           this.props.changeProfileItem(e.target.id);
         }}
         id={this.props.id}

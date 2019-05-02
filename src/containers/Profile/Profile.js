@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ProfileItem from '../ProfileItem/ProfileItem';
+import { stat } from 'fs';
 
 class Profile extends Component {
   constructor(props) {
@@ -8,13 +9,26 @@ class Profile extends Component {
 
     this.state = {
       profileList: [],
+      allowEdit: true,
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    var profileList = document.getElementById('profileList');
-    profileList.scrollTo(0, profileList.scrollHeight);
+  componentDidMount() {
+    // document.getElementById('profileEdit').classList.add('show');
+    // document.getElementById('profileDelete').classList.add('show');
+    this.props.dulieu.forEach(e => {
+      if (e.class.includes('no-edit')) {
+        this.setState({
+          allowEdit: false,
+        });
+      }
+    });
   }
+
+  // componentDidUpdate(prevProps, prevState) {
+  //   var profileList = document.getElementById('profileList');
+  //   profileList.scrollTo(0, profileList.scrollHeight);
+  // }
 
   PrintProfileList = () => {
     if (this.props.dulieu) {
@@ -55,10 +69,18 @@ class Profile extends Component {
               id="profileAdd"
               onClick={() => this.addProfileList()}
             />
-            <div className="icon edit" id="profileEdit" />
-            <div className="icon delete" id="profileDelete" />
-            <div className="icon down" id="profileDown" />
-            <div className="icon up disabled" id="profileUp" />
+            <div className="icon edit show " id="profileEdit" />
+            <div className="icon delete show " id="profileDelete" />
+            <div
+              className={this.props.isDown ? 'icon down' : 'icon down disabled'}
+              id="profileDown"
+              onClick={() => this.props.downProfileItem()}
+            />
+            <div
+              className={this.props.isUp ? 'icon up' : 'icon up disabled'}
+              id="profileUp"
+              onClick={() => this.props.upProfileItem()}
+            />
           </div>
           <div id="profileDelCfm" className="profile-del alert flex">
             <div className="title">delete eq</div>
@@ -78,6 +100,8 @@ class Profile extends Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     dulieu: state.profileArr,
+    isUp: state.isUp,
+    isDown: state.isDown,
   };
 };
 
@@ -94,6 +118,16 @@ const mapDispatchToProps = (dispatch, ownProps) => {
           iconName: 'custom',
           class: 'profile-item custom active',
         },
+      });
+    },
+    upProfileItem: () => {
+      dispatch({
+        type: 'UP_PROFILE_ITEM',
+      });
+    },
+    downProfileItem: () => {
+      dispatch({
+        type: 'DOWN_PROFILE_ITEM',
       });
     },
   };
