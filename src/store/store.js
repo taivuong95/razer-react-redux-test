@@ -1,30 +1,36 @@
 var redux = require('redux');
 
+function vietHoaChuCaiDau(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 const profileListState = {
   selectedItemContent: 'Default',
   isUp: false,
   isDown: true,
+  notAllowEdit: true,
+  openDeletePopup: false,
   profileArr: [
     {
-      id: 'profle1',
+      id: 'profile1',
       name: 'default',
       iconName: 'custom',
       class: 'profile-item active default no-edit',
     },
     {
-      id: 'profle2',
+      id: 'profile2',
       name: 'game',
       iconName: 'game',
       class: 'profile-item game no-edit',
     },
     {
-      id: 'profle3',
+      id: 'profile3',
       name: 'movie',
       iconName: 'movie',
       class: 'profile-item movie no-edit',
     },
     {
-      id: 'profle4',
+      id: 'profile4',
       name: 'music',
       iconName: 'music',
       class: 'profile-item music no-edit',
@@ -53,13 +59,13 @@ const reducer = (state = profileListState, action) => {
           e.class = e.class.replace('active', '').trim();
         }
       });
+
       let newActiveItem = cloneProfileArr.find(
         element => element.id.toUpperCase() === action.payload.toUpperCase()
       );
       let newActiveIndex = cloneProfileArr.findIndex(
         element => element.id.toUpperCase() === action.payload.toUpperCase()
       );
-
       let tempNewItem = {
         ...newActiveItem,
         class: newActiveItem.class + ' active',
@@ -69,12 +75,13 @@ const reducer = (state = profileListState, action) => {
 
       return {
         ...state,
+        notAllowEdit: /profile[1-4]/.test(newActiveItem.id) ? true : false,
         isUp:
           newActiveIndex > 0 && newActiveIndex <= cloneProfileArr.length
             ? true
             : false,
         isDown: newActiveIndex < cloneProfileArr.length - 1 ? true : false,
-        selectedItemContent: action.payload,
+        selectedItemContent: action.content,
         profileArr: [...cloneProfileArr],
       };
 
@@ -90,6 +97,10 @@ const reducer = (state = profileListState, action) => {
 
       return {
         ...state,
+        isUp: true,
+        isDown: false,
+        notAllowEdit: /profile[1-4]/.test(action.newItem.id) ? true : false,
+        selectedItemContent: action.newItem.name,
         profileArr: [...newProfileArr, action.newItem],
       };
 
@@ -110,10 +121,17 @@ const reducer = (state = profileListState, action) => {
           updatedProfileArrAfterUp[newPosition],
           updatedProfileArrAfterUp[oldPosition],
         ];
+
+        state.notAllowEdit = /profile[1-4]/.test(
+          updatedProfileArrAfterUp[newPosition].id
+        )
+          ? true
+          : false;
       }
 
       return {
         ...state,
+        notAllowEdit: state.notAllowEdit,
         isUp:
           newPosition > 0 && newPosition <= updatedProfileArrAfterUp.length
             ? true
@@ -140,16 +158,42 @@ const reducer = (state = profileListState, action) => {
           updatedProfileArrAfterDown[newPos],
           updatedProfileArrAfterDown[oldPos],
         ];
+
+        state.notAllowEdit = /profile[1-4]/.test(
+          updatedProfileArrAfterDown[newPos].id
+        )
+          ? true
+          : false;
       }
 
       return {
         ...state,
+        notAllowEdit: state.notAllowEdit,
         isUp:
           newPos > 0 && newPos <= updatedProfileArrAfterDown.length
             ? true
             : false,
         isDown: newPos < updatedProfileArrAfterDown.length - 1 ? true : false,
         profileArr: [...updatedProfileArrAfterDown],
+      };
+
+    case 'OPEN_DELETE_POPUP':
+      return { ...state, openDeletePopup: true };
+
+    case 'CLOSE_DELETE_POPUP':
+      return { ...state, openDeletePopup: false };
+
+    case 'DELETE_PROFILE_ITEM':
+      let lists = [...state.profileArr];
+      let found = lists.findIndex(element => element.class.includes('active'));
+      if (found === 0) lists[found - 1] = lists[found + 1];
+      lists[found - 1].class = lists[found - 1].class + ' active';
+      lists.splice(found, 1);
+      return {
+        ...state,
+        profileArr: [...lists],
+        notAllowEdit: /profile[1-4]/.test(lists[found - 1].id) ? true : false,
+        selectedItemContent: vietHoaChuCaiDau(lists[found - 1].name),
       };
 
     default:

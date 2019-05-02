@@ -5,7 +5,7 @@ class ProfileItem extends Component {
     return (
       <div
         onClick={e => {
-          this.props.changeProfileItem(e.target.id);
+          this.props.changeProfileItem(e.target.id, e.target.innerText);
         }}
         id={this.props.id}
         className={this.props.class}
@@ -24,10 +24,11 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    changeProfileItem: selectedItemContent => {
+    changeProfileItem: (selectedItemContent, content) => {
       dispatch({
         type: 'CHANGE_PROFILE_ITEM',
         payload: selectedItemContent,
+        content,
       });
     },
   };

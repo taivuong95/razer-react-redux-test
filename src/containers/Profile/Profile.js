@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ProfileItem from '../ProfileItem/ProfileItem';
-import { stat } from 'fs';
 
 class Profile extends Component {
   constructor(props) {
@@ -9,26 +8,27 @@ class Profile extends Component {
 
     this.state = {
       profileList: [],
-      allowEdit: true,
+      count: 0,
     };
   }
 
-  componentDidMount() {
-    // document.getElementById('profileEdit').classList.add('show');
-    // document.getElementById('profileDelete').classList.add('show');
-    this.props.dulieu.forEach(e => {
-      if (e.class.includes('no-edit')) {
-        this.setState({
-          allowEdit: false,
-        });
-      }
+  closeDropDownWhenClickOutSide = (args, fn) => {
+    document.addEventListener('click', evt => {
+      const flyoutElement = document.getElementById(args);
+      let targetElement = evt.target; // clicked element
+      do {
+        if (targetElement == flyoutElement) {
+          // Do nothing, just return.
+          return;
+        }
+        // Go up the DOM.
+        targetElement = targetElement.parentNode;
+      } while (targetElement);
+      fn();
     });
-  }
+  };
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   var profileList = document.getElementById('profileList');
-  //   profileList.scrollTo(0, profileList.scrollHeight);
-  // }
+  componentDidMount() {}
 
   PrintProfileList = () => {
     if (this.props.dulieu) {
@@ -47,9 +47,16 @@ class Profile extends Component {
     this.setState({
       profileList: this.props.dulieu,
     });
+    var profileList = document.getElementById('profileList');
+    profileList.scrollTo(0, profileList.scrollHeight);
   };
 
   render() {
+    if (this.state.count === 1) {
+      this.closeDropDownWhenClickOutSide('profileDelete', () => {
+        this.props.closeDelete();
+      });
+    }
     return (
       <div className="thx-drawer flex">
         <div className="main-title">Profile List</div>
@@ -69,8 +76,24 @@ class Profile extends Component {
               id="profileAdd"
               onClick={() => this.addProfileList()}
             />
-            <div className="icon edit show " id="profileEdit" />
-            <div className="icon delete show " id="profileDelete" />
+            <div
+              className={
+                this.props.notAllowEdit ? 'icon edit' : 'icon edit show'
+              }
+              id="profileEdit"
+            />
+            <div
+              className={
+                this.props.notAllowEdit ? 'icon delete' : 'icon delete show'
+              }
+              id="profileDelete"
+              onClick={() => {
+                this.props.openDelete();
+                this.setState({
+                  count: 1,
+                });
+              }}
+            />
             <div
               className={this.props.isDown ? 'icon down' : 'icon down disabled'}
               id="profileDown"
@@ -82,12 +105,26 @@ class Profile extends Component {
               onClick={() => this.props.upProfileItem()}
             />
           </div>
-          <div id="profileDelCfm" className="profile-del alert flex">
+          <div
+            id="profileDelCfm"
+            className={
+              this.props.openDeletePopup
+                ? 'profile-del alert flex show'
+                : 'profile-del alert flex '
+            }
+          >
             <div className="title">delete eq</div>
             <div className="body-text t-center" id="delName">
               delete eq
             </div>
-            <div className="thx-btn" id="cfmDelete">
+            <div
+              className="thx-btn"
+              id="cfmDelete"
+              onClick={() => {
+                this.props.deleteProfileItem();
+                this.props.closeDelete();
+              }}
+            >
               delete
             </div>
           </div>
@@ -102,6 +139,8 @@ const mapStateToProps = (state, ownProps) => {
     dulieu: state.profileArr,
     isUp: state.isUp,
     isDown: state.isDown,
+    notAllowEdit: state.notAllowEdit,
+    openDeletePopup: state.openDeletePopup,
   };
 };
 
@@ -128,6 +167,21 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     downProfileItem: () => {
       dispatch({
         type: 'DOWN_PROFILE_ITEM',
+      });
+    },
+    openDelete: () => {
+      dispatch({
+        type: 'OPEN_DELETE_POPUP',
+      });
+    },
+    closeDelete: () => {
+      dispatch({
+        type: 'CLOSE_DELETE_POPUP',
+      });
+    },
+    deleteProfileItem: () => {
+      dispatch({
+        type: 'DELETE_PROFILE_ITEM',
       });
     },
   };
