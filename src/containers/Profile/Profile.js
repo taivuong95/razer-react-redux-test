@@ -8,7 +8,6 @@ class Profile extends Component {
 
     this.state = {
       profileList: [],
-      count: 0,
     };
   }
 
@@ -16,6 +15,7 @@ class Profile extends Component {
     document.addEventListener('click', evt => {
       const flyoutElement = document.getElementById(args);
       let targetElement = evt.target; // clicked element
+
       do {
         if (targetElement == flyoutElement) {
           // Do nothing, just return.
@@ -28,7 +28,11 @@ class Profile extends Component {
     });
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    // this.closeDropDownWhenClickOutSide('profileRename', () => {
+    //   this.props.closeEdit();
+    // });
+  }
 
   PrintProfileList = () => {
     if (this.props.dulieu) {
@@ -51,12 +55,25 @@ class Profile extends Component {
     profileList.scrollTo(0, profileList.scrollHeight);
   };
 
+  onRenameClicked = () => {
+    this.props.openEdit();
+    let selectedItem = document.getElementById('profileRename');
+    selectedItem.value = this.props.selectedItemContent;
+  };
+
+  componentDidUpdate(prevProps, prevState) {
+    this._input.focus();
+  }
+
+  handleFocus = e => {
+    e.target.select();
+  };
+
+  // handleChange = e => {
+  //   console.log(e.target.value);
+  // };
+
   render() {
-    if (this.state.count === 1) {
-      this.closeDropDownWhenClickOutSide('profileDelete', () => {
-        this.props.closeDelete();
-      });
-    }
     return (
       <div className="thx-drawer flex">
         <div className="main-title">Profile List</div>
@@ -65,9 +82,27 @@ class Profile extends Component {
             {this.PrintProfileList()}
             <input
               id="profileRename"
-              className="profile-item"
+              className={
+                this.props.openEditPopup ? 'profile-item show' : 'profile-item'
+              }
+              style={{ top: this.props.height.toString() + 'px' }}
               placeholder="Enter Profile Name"
               maxLength={25}
+              onFocus={this.handleFocus}
+              autofocus="true"
+              ref={c => (this._input = c)}
+              onChange={e => this.props.renameOnchange(e.target.value)}
+              onKeyDown={e => {
+                if (e.keyCode === 13) {
+                  this.props.onRenameHandler(e.target.value);
+                  this.props.closeEdit();
+                }
+              }}
+              onBlur={e => {
+                this.props.onRenameHandler(e.target.value);
+                this.props.closeEdit();
+              }}
+              tabIndex="0"
             />
           </div>
           <div className="toolbar flex">
@@ -81,6 +116,7 @@ class Profile extends Component {
                 this.props.notAllowEdit ? 'icon edit' : 'icon edit show'
               }
               id="profileEdit"
+              onClick={() => this.onRenameClicked()}
             />
             <div
               className={
@@ -89,9 +125,6 @@ class Profile extends Component {
               id="profileDelete"
               onClick={() => {
                 this.props.openDelete();
-                this.setState({
-                  count: 1,
-                });
               }}
             />
             <div
@@ -112,6 +145,9 @@ class Profile extends Component {
                 ? 'profile-del alert flex show'
                 : 'profile-del alert flex '
             }
+            onBlur={() => this.props.closeDelete()}
+            tabIndex="0"
+            ref={c => (this._input = c)}
           >
             <div className="title">delete eq</div>
             <div className="body-text t-center" id="delName">
@@ -123,6 +159,7 @@ class Profile extends Component {
               onClick={() => {
                 this.props.deleteProfileItem();
                 this.props.closeDelete();
+                this.props.closeEdit();
               }}
             >
               delete
@@ -141,6 +178,9 @@ const mapStateToProps = (state, ownProps) => {
     isDown: state.isDown,
     notAllowEdit: state.notAllowEdit,
     openDeletePopup: state.openDeletePopup,
+    openEditPopup: state.openEditPopup,
+    selectedItemContent: state.selectedItemContent,
+    height: state.height,
   };
 };
 
@@ -179,9 +219,31 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         type: 'CLOSE_DELETE_POPUP',
       });
     },
+    openEdit: () => {
+      dispatch({
+        type: 'OPEN_EDIT_POPUP',
+      });
+    },
+    closeEdit: () => {
+      dispatch({
+        type: 'CLOSE_EDIT_POPUP',
+      });
+    },
     deleteProfileItem: () => {
       dispatch({
         type: 'DELETE_PROFILE_ITEM',
+      });
+    },
+    renameOnchange: content => {
+      dispatch({
+        type: 'RENAME_ONCHANGE',
+        content,
+      });
+    },
+    onRenameHandler: content => {
+      dispatch({
+        type: 'RENAME_HANDLER',
+        content,
       });
     },
   };

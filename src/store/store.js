@@ -10,6 +10,8 @@ const profileListState = {
   isDown: true,
   notAllowEdit: true,
   openDeletePopup: false,
+  openEditPopup: false,
+  height: 0,
   profileArr: [
     {
       id: 'profile1',
@@ -66,6 +68,7 @@ const reducer = (state = profileListState, action) => {
       let newActiveIndex = cloneProfileArr.findIndex(
         element => element.id.toUpperCase() === action.payload.toUpperCase()
       );
+
       let tempNewItem = {
         ...newActiveItem,
         class: newActiveItem.class + ' active',
@@ -83,6 +86,7 @@ const reducer = (state = profileListState, action) => {
         isDown: newActiveIndex < cloneProfileArr.length - 1 ? true : false,
         selectedItemContent: action.content,
         profileArr: [...cloneProfileArr],
+        height: newActiveIndex * 30,
       };
 
     case 'ADD_PROFILE_ITEM':
@@ -102,6 +106,7 @@ const reducer = (state = profileListState, action) => {
         notAllowEdit: /profile[1-4]/.test(action.newItem.id) ? true : false,
         selectedItemContent: action.newItem.name,
         profileArr: [...newProfileArr, action.newItem],
+        height: newProfileArr.length * 30,
       };
 
     case 'UP_PROFILE_ITEM':
@@ -183,6 +188,12 @@ const reducer = (state = profileListState, action) => {
     case 'CLOSE_DELETE_POPUP':
       return { ...state, openDeletePopup: false };
 
+    case 'OPEN_EDIT_POPUP':
+      return { ...state, openEditPopup: true };
+
+    case 'CLOSE_EDIT_POPUP':
+      return { ...state, openEditPopup: false };
+
     case 'DELETE_PROFILE_ITEM':
       let lists = [...state.profileArr];
       let found = lists.findIndex(element => element.class.includes('active'));
@@ -194,6 +205,33 @@ const reducer = (state = profileListState, action) => {
         profileArr: [...lists],
         notAllowEdit: /profile[1-4]/.test(lists[found - 1].id) ? true : false,
         selectedItemContent: vietHoaChuCaiDau(lists[found - 1].name),
+        height: (lists.length - 1) * 30,
+      };
+
+    case 'RENAME_ONCHANGE':
+      return { ...state, selectedItemContent: action.content };
+
+    case 'RENAME_HANDLER':
+      console.log(action.content);
+      var updatedProfileArrAfterRename = [...state.profileArr];
+      let element = updatedProfileArrAfterRename.find(element =>
+        element.class.includes('active')
+      );
+      let position = updatedProfileArrAfterRename.findIndex(element =>
+        element.class.includes('active')
+      );
+
+      let newELement = {
+        ...element,
+        name: action.content,
+      };
+
+      updatedProfileArrAfterRename.splice(position, 1, newELement);
+
+      return {
+        ...state,
+        selectedItemContent: vietHoaChuCaiDau(action.content),
+        profileArr: [...updatedProfileArrAfterRename],
       };
 
     default:
