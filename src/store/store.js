@@ -54,7 +54,6 @@ const profileListState = {
 const reducer = (state = profileListState, action) => {
   switch (action.type) {
     case 'CHANGE_PROFILE_ITEM':
-      console.log('Change PROFILE NE');
       var cloneProfileArr = [...state.profileArr];
       cloneProfileArr.forEach(e => {
         if (e.class.includes('active')) {
@@ -87,11 +86,10 @@ const reducer = (state = profileListState, action) => {
         selectedItemContent: action.content,
         profileArr: [...cloneProfileArr],
         height: newActiveIndex * 30,
+        openEditPopup: false,
       };
 
     case 'ADD_PROFILE_ITEM':
-      console.log('ADD PROFILE NE');
-
       var newProfileArr = [...state.profileArr];
       newProfileArr.forEach(e => {
         if (e.class.includes('active')) {
@@ -110,7 +108,6 @@ const reducer = (state = profileListState, action) => {
       };
 
     case 'UP_PROFILE_ITEM':
-      console.log('UP PROFILE NE');
       var updatedProfileArrAfterUp = [...state.profileArr];
       let oldPosition = updatedProfileArrAfterUp.findIndex(element =>
         element.class.includes('active')
@@ -144,10 +141,10 @@ const reducer = (state = profileListState, action) => {
         isDown:
           newPosition < updatedProfileArrAfterUp.length - 1 ? true : false,
         profileArr: [...updatedProfileArrAfterUp],
+        height: newPosition * 30,
       };
 
     case 'DOWN_PROFILE_ITEM':
-      console.log('DOWN PROFILE NE');
       var updatedProfileArrAfterDown = [...state.profileArr];
       let oldPos = updatedProfileArrAfterDown.findIndex(element =>
         element.class.includes('active')
@@ -180,6 +177,7 @@ const reducer = (state = profileListState, action) => {
             : false,
         isDown: newPos < updatedProfileArrAfterDown.length - 1 ? true : false,
         profileArr: [...updatedProfileArrAfterDown],
+        height: newPos * 30,
       };
 
     case 'OPEN_DELETE_POPUP':
@@ -204,6 +202,7 @@ const reducer = (state = profileListState, action) => {
         ...state,
         profileArr: [...lists],
         notAllowEdit: /profile[1-4]/.test(lists[found - 1].id) ? true : false,
+        isUp: found - 1 > 0 && found - 1 <= lists.length ? true : false,
         selectedItemContent: vietHoaChuCaiDau(lists[found - 1].name),
         height: (lists.length - 1) * 30,
       };
@@ -212,7 +211,6 @@ const reducer = (state = profileListState, action) => {
       return { ...state, selectedItemContent: action.content };
 
     case 'RENAME_HANDLER':
-      console.log(action.content);
       var updatedProfileArrAfterRename = [...state.profileArr];
       let element = updatedProfileArrAfterRename.find(element =>
         element.class.includes('active')

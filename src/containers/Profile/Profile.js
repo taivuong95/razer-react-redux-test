@@ -28,12 +28,6 @@ class Profile extends Component {
     });
   };
 
-  componentDidMount() {
-    // this.closeDropDownWhenClickOutSide('profileRename', () => {
-    //   this.props.closeEdit();
-    // });
-  }
-
   PrintProfileList = () => {
     if (this.props.dulieu) {
       return this.props.dulieu.map((value, key) => {
@@ -57,12 +51,14 @@ class Profile extends Component {
 
   onRenameClicked = () => {
     this.props.openEdit();
-    let selectedItem = document.getElementById('profileRename');
-    selectedItem.value = this.props.selectedItemContent;
   };
 
   componentDidUpdate(prevProps, prevState) {
-    this._input.focus();
+    let selectedItem = document.getElementById('profileRename');
+    selectedItem.value = this.props.selectedItemContent;
+    selectedItem.focus(); // focus for rename field
+
+    this._input.focus(); // focus for delete button
   }
 
   handleFocus = e => {
@@ -88,9 +84,9 @@ class Profile extends Component {
               style={{ top: this.props.height.toString() + 'px' }}
               placeholder="Enter Profile Name"
               maxLength={25}
-              onFocus={this.handleFocus}
-              autofocus="true"
-              ref={c => (this._input = c)}
+              autoFocus
+              onFocus={e => this.handleFocus(e)}
+              ref={input => (this._input = input)}
               onChange={e => this.props.renameOnchange(e.target.value)}
               onKeyDown={e => {
                 if (e.keyCode === 13) {
