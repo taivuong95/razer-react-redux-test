@@ -17,7 +17,7 @@ class Profile extends Component {
       let targetElement = evt.target; // clicked element
 
       do {
-        if (targetElement == flyoutElement) {
+        if (targetElement === flyoutElement) {
           // Do nothing, just return.
           return;
         }
@@ -45,8 +45,6 @@ class Profile extends Component {
     this.setState({
       profileList: this.props.dulieu,
     });
-    var profileList = document.getElementById('profileList');
-    profileList.scrollTo(0, profileList.scrollHeight);
   };
 
   onRenameClicked = () => {
@@ -59,6 +57,9 @@ class Profile extends Component {
     selectedItem.focus(); // focus for rename field
 
     this._input.focus(); // focus for delete button
+
+    var profileList = document.getElementById('profileList');
+    profileList.scrollTo(0, profileList.scrollHeight);
   }
 
   handleFocus = e => {
