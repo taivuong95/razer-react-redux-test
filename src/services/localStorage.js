@@ -1,8 +1,12 @@
 import { profileArr } from '../models/data';
 export const getDataFromLS = () => {
-  return (
-    JSON.parse(localStorage.getItem('profileArr')) || saveDataToLS(profileArr)
-  );
+  if (typeof Storage !== 'undefined') {
+    return (
+      JSON.parse(localStorage.getItem('profileArr')) || saveDataToLS(profileArr)
+    );
+  } else {
+    console.log('a');
+  }
 };
 
 export const saveDataToLS = currentArr => {

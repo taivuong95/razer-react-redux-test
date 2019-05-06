@@ -12,10 +12,11 @@ import {
   CLOSE_EDIT_POPUP,
 } from './actions';
 
-import { vietHoaChuCaiDau } from '../utils/fnUtil';
+import { capitalizeFirstLetterEachWord } from '../utils/fnUtil';
 import { profileListState } from '../models/profileModel';
-import { saveDataToLS, getDataFromLS } from '../services/localStorage';
+import { saveDataToLS } from '../services/localStorage';
 
+var t;
 const reducer = (state = profileListState, action) => {
   switch (action.type) {
     case CHANGE_PROFILE_ITEM:
@@ -39,8 +40,10 @@ const reducer = (state = profileListState, action) => {
       };
 
       cloneProfileArr.splice(newActiveIndex, 1, tempNewItem);
-
-      saveDataToLS(cloneProfileArr);
+      clearTimeout(t);
+      t = setTimeout(() => {
+        saveDataToLS(cloneProfileArr);
+      }, 2000);
       return {
         ...state,
         notAllowEdit: /profile[1-4]/.test(newActiveItem.id) ? true : false,
@@ -71,8 +74,10 @@ const reducer = (state = profileListState, action) => {
         class: 'profile-item custom active',
       };
       newProfileArr.push(newItem);
-
-      saveDataToLS(newProfileArr);
+      clearTimeout(t);
+      t = setTimeout(() => {
+        saveDataToLS(newProfileArr);
+      }, 2000);
 
       return {
         ...state,
@@ -81,7 +86,7 @@ const reducer = (state = profileListState, action) => {
         notAllowEdit: /profile[1-4]/.test(newItem.id) ? true : false,
         selectedItemContent: newItem.name,
         profileArr: [...newProfileArr],
-        height: newProfileArr.length * 30,
+        height: (newProfileArr.length - 1) * 30,
       };
 
     case UP_PROFILE_ITEM:
@@ -107,7 +112,11 @@ const reducer = (state = profileListState, action) => {
           ? true
           : false;
       }
-      saveDataToLS(updatedProfileArrAfterUp);
+      clearTimeout(t);
+      t = setTimeout(() => {
+        saveDataToLS(updatedProfileArrAfterUp);
+      }, 2000);
+
       return {
         ...state,
         notAllowEdit: state.notAllowEdit,
@@ -144,7 +153,11 @@ const reducer = (state = profileListState, action) => {
           ? true
           : false;
       }
-      saveDataToLS(updatedProfileArrAfterDown);
+      clearTimeout(t);
+      t = setTimeout(() => {
+        saveDataToLS(updatedProfileArrAfterDown);
+      }, 2000);
+
       return {
         ...state,
         notAllowEdit: state.notAllowEdit,
@@ -176,13 +189,19 @@ const reducer = (state = profileListState, action) => {
       lists[found - 1].class = lists[found - 1].class + ' active';
 
       lists.splice(found, 1);
-      saveDataToLS(lists);
+
+      t = setTimeout(() => {
+        saveDataToLS(lists);
+      }, 2000);
+
       return {
         ...state,
         profileArr: [...lists],
         notAllowEdit: /profile[1-4]/.test(lists[found - 1].id) ? true : false,
         isUp: found - 1 > 0 && found - 1 <= lists.length ? true : false,
-        selectedItemContent: vietHoaChuCaiDau(lists[found - 1].name),
+        selectedItemContent: capitalizeFirstLetterEachWord(
+          lists[found - 1].name
+        ),
         height: (found - 1) * 30,
       };
 
@@ -204,11 +223,16 @@ const reducer = (state = profileListState, action) => {
       };
 
       updatedProfileArrAfterRename.splice(position, 1, newELement);
-      saveDataToLS(updatedProfileArrAfterRename);
+
+      t = setTimeout(() => {
+        saveDataToLS(updatedProfileArrAfterRename);
+      }, 2000);
+
       return {
         ...state,
-        selectedItemContent: vietHoaChuCaiDau(action.content),
+        selectedItemContent: capitalizeFirstLetterEachWord(action.content),
         profileArr: [...updatedProfileArrAfterRename],
+        height: position * 30,
       };
 
     default:
