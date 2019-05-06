@@ -14,6 +14,7 @@ import {
 
 import { vietHoaChuCaiDau } from '../utils/fnUtil';
 import { profileListState } from '../models/profileModel';
+import { saveDataToLS, getDataFromLS } from '../services/localStorage';
 
 const reducer = (state = profileListState, action) => {
   switch (action.type) {
@@ -39,6 +40,7 @@ const reducer = (state = profileListState, action) => {
 
       cloneProfileArr.splice(newActiveIndex, 1, tempNewItem);
 
+      saveDataToLS(cloneProfileArr);
       return {
         ...state,
         notAllowEdit: /profile[1-4]/.test(newActiveItem.id) ? true : false,
@@ -54,6 +56,7 @@ const reducer = (state = profileListState, action) => {
       };
 
     case ADD_PROFILE_ITEM:
+      var timestamp = new Date().getUTCMilliseconds(); // dummy div id
       var newProfileArr = [...state.profileArr];
       newProfileArr.forEach(e => {
         if (e.class.includes('active')) {
@@ -61,13 +64,23 @@ const reducer = (state = profileListState, action) => {
         }
       });
 
+      let newItem = {
+        id: 'new-profile-' + timestamp,
+        name: 'New Profile',
+        iconName: 'custom',
+        class: 'profile-item custom active',
+      };
+      newProfileArr.push(newItem);
+
+      saveDataToLS(newProfileArr);
+
       return {
         ...state,
         isUp: true,
         isDown: false,
-        notAllowEdit: /profile[1-4]/.test(action.newItem.id) ? true : false,
-        selectedItemContent: action.newItem.name,
-        profileArr: [...newProfileArr, action.newItem],
+        notAllowEdit: /profile[1-4]/.test(newItem.id) ? true : false,
+        selectedItemContent: newItem.name,
+        profileArr: [...newProfileArr],
         height: newProfileArr.length * 30,
       };
 
@@ -94,7 +107,7 @@ const reducer = (state = profileListState, action) => {
           ? true
           : false;
       }
-
+      saveDataToLS(updatedProfileArrAfterUp);
       return {
         ...state,
         notAllowEdit: state.notAllowEdit,
@@ -131,7 +144,7 @@ const reducer = (state = profileListState, action) => {
           ? true
           : false;
       }
-
+      saveDataToLS(updatedProfileArrAfterDown);
       return {
         ...state,
         notAllowEdit: state.notAllowEdit,
@@ -163,6 +176,7 @@ const reducer = (state = profileListState, action) => {
       lists[found - 1].class = lists[found - 1].class + ' active';
 
       lists.splice(found, 1);
+      saveDataToLS(lists);
       return {
         ...state,
         profileArr: [...lists],
@@ -190,7 +204,7 @@ const reducer = (state = profileListState, action) => {
       };
 
       updatedProfileArrAfterRename.splice(position, 1, newELement);
-
+      saveDataToLS(updatedProfileArrAfterRename);
       return {
         ...state,
         selectedItemContent: vietHoaChuCaiDau(action.content),

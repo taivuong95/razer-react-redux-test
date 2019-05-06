@@ -1,47 +1,24 @@
+import { getDataFromLS, saveDataToLS } from '../services/localStorage';
+import { vietHoaChuCaiDau } from '../utils/fnUtil';
+import { profileArr } from './data';
+var arr = getDataFromLS();
+var name = '';
+var i = 0;
+
+arr.forEach((e, index) => {
+  if (e.class.includes('active')) {
+    name = e.name;
+    i = index;
+  }
+});
+
 export const profileListState = {
-  selectedItemContent: 'Default',
-  isUp: false,
-  isDown: true,
-  notAllowEdit: true,
+  selectedItemContent: vietHoaChuCaiDau(name),
+  isUp: i > 0 && i <= arr.length ? true : false,
+  isDown: i < arr.length - 1 ? true : false,
+  notAllowEdit: /profile[1-4]/.test(arr[i].id) ? true : false,
   openDeletePopup: false,
   openEditPopup: false,
-  height: 0,
-  profileArr: [
-    {
-      id: 'profile1',
-      name: 'default',
-      iconName: 'custom',
-      class: 'profile-item active default no-edit',
-    },
-    {
-      id: 'profile2',
-      name: 'game',
-      iconName: 'game',
-      class: 'profile-item game no-edit',
-    },
-    {
-      id: 'profile3',
-      name: 'movie',
-      iconName: 'movie',
-      class: 'profile-item movie no-edit',
-    },
-    {
-      id: 'profile4',
-      name: 'music',
-      iconName: 'music',
-      class: 'profile-item music no-edit',
-    },
-    {
-      id: 'custom1',
-      name: 'Custom 1',
-      iconName: 'custom',
-      class: 'profile-item custom',
-    },
-    {
-      id: 'custom2',
-      name: 'demo long text demo long text',
-      iconName: 'custom',
-      class: 'profile-item custom',
-    },
-  ],
+  height: i * 30,
+  profileArr: arr,
 };

@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ProfileItem from '../ProfileItem/ProfileItem';
-
+import { getDataFromLS } from '../../services/localStorage';
+let profileList = React.createRef();
 class Profile extends Component {
+  // textInput must be declared here so the ref can refer to it
+
   constructor(props) {
     super(props);
 
     this.state = {
       profileList: [],
     };
+  }
+  //WARNING! To be deprecated in React v17. Use componentDidMount instead.
+  componentDidMount() {
+    var profileList = document.getElementById('profileList');
+    profileList.scrollTo(0, this.props.height);
   }
 
   closeDropDownWhenClickOutSide = (args, fn) => {
@@ -42,9 +50,8 @@ class Profile extends Component {
 
   addProfileList = () => {
     this.props.addProfileItem();
-    this.setState({
-      profileList: this.props.dulieu,
-    });
+    var profileList = document.getElementById('profileList');
+    profileList.scrollTo(0, this.props.height);
   };
 
   onRenameClicked = () => {
@@ -59,7 +66,7 @@ class Profile extends Component {
     this._input.focus(); // focus for delete button
 
     var profileList = document.getElementById('profileList');
-    profileList.scrollTo(0, profileList.scrollHeight);
+    profileList.scrollTo(0, this.props.height);
   }
 
   handleFocus = e => {
@@ -75,7 +82,7 @@ class Profile extends Component {
       <div className="thx-drawer flex">
         <div className="main-title">Profile List</div>
         <div id="profileWrapper" className="drawer-select flex">
-          <div id="profileList" className="scrollable">
+          <div id="profileList" className="scrollable" ref={profileList}>
             {this.PrintProfileList()}
             <input
               id="profileRename"
@@ -182,18 +189,10 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  var count = 0; // dummy div id
   return {
     addProfileItem: () => {
-      count++;
       dispatch({
         type: 'ADD_PROFILE_ITEM',
-        newItem: {
-          id: 'new-profile-' + count,
-          name: 'New Profile',
-          iconName: 'custom',
-          class: 'profile-item custom active',
-        },
       });
     },
     upProfileItem: () => {
