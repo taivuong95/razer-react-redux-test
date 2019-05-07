@@ -15,6 +15,9 @@ import {
 import { capitalizeFirstLetterEachWord } from '../utils/fnUtil';
 import { profileListState } from '../models/profileModel';
 import { saveDataToLS } from '../services/localStorage';
+// import * as firebase from 'firebase';
+// import { firebaseConnect } from '../services/firebaseConnect';
+import { addDataToFireBase } from '../services/firebaseConnect';
 
 var t;
 const reducer = (state = profileListState, action) => {
@@ -43,6 +46,7 @@ const reducer = (state = profileListState, action) => {
       clearTimeout(t);
       t = setTimeout(() => {
         saveDataToLS(cloneProfileArr);
+        addDataToFireBase(cloneProfileArr);
       }, 2000);
       return {
         ...state,
@@ -77,6 +81,7 @@ const reducer = (state = profileListState, action) => {
       clearTimeout(t);
       t = setTimeout(() => {
         saveDataToLS(newProfileArr);
+        addDataToFireBase(newProfileArr);
       }, 2000);
 
       return {
@@ -115,6 +120,7 @@ const reducer = (state = profileListState, action) => {
       clearTimeout(t);
       t = setTimeout(() => {
         saveDataToLS(updatedProfileArrAfterUp);
+        addDataToFireBase(updatedProfileArrAfterUp);
       }, 2000);
 
       return {
@@ -156,6 +162,7 @@ const reducer = (state = profileListState, action) => {
       clearTimeout(t);
       t = setTimeout(() => {
         saveDataToLS(updatedProfileArrAfterDown);
+        addDataToFireBase(updatedProfileArrAfterDown);
       }, 2000);
 
       return {
@@ -192,6 +199,7 @@ const reducer = (state = profileListState, action) => {
 
       t = setTimeout(() => {
         saveDataToLS(lists);
+        addDataToFireBase(lists);
       }, 2000);
 
       return {
@@ -226,6 +234,7 @@ const reducer = (state = profileListState, action) => {
 
       t = setTimeout(() => {
         saveDataToLS(updatedProfileArrAfterRename);
+        addDataToFireBase(updatedProfileArrAfterRename);
       }, 2000);
 
       return {
