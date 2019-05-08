@@ -14,10 +14,10 @@ class Profile extends Component {
     };
   }
   //WARNING! To be deprecated in React v17. Use componentDidMount instead.
-  componentDidMount() {
-    var profileList = document.getElementById('profileList');
-    profileList.scrollTo(0, this.props.height);
-  }
+  // componentDidMount() {
+  //   var profileList = document.getElementById('profileList');
+  //   profileList.scrollTo(0, this.props.height);
+  // }
 
   closeDropDownWhenClickOutSide = (args, fn) => {
     document.addEventListener('click', evt => {

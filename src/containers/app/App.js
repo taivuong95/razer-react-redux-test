@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import './App.css';
 import Profile from '../Profile/Profile';
 import Content from '../Content/Content';
-import { firebaseConnect } from '../../services/firebaseConnect';
 class App extends Component {
   render() {
     return (
