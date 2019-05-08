@@ -14,16 +14,17 @@ import {
 
 import { capitalizeFirstLetterEachWord } from '../utils/fnUtil';
 import { profileListState } from '../models/profileModel';
-import { saveDataToLS } from '../services/localStorage';
+import { saveDataToLS, getDataFromLS } from '../services/localStorage';
 // import * as firebase from 'firebase';
 // import { firebaseConnect } from '../services/firebaseConnect';
 import { addDataToFireBase } from '../services/firebaseConnect';
 
-var t;
 const reducer = (state = profileListState, action) => {
+  var arrLS = getDataFromLS();
+  var t;
   switch (action.type) {
     case CHANGE_PROFILE_ITEM:
-      var cloneProfileArr = [...state.profileArr];
+      var cloneProfileArr = [...arrLS];
       cloneProfileArr.forEach(e => {
         if (e.class.includes('active')) {
           e.class = e.class.replace('active', '').trim();
@@ -48,6 +49,7 @@ const reducer = (state = profileListState, action) => {
         saveDataToLS(cloneProfileArr);
         addDataToFireBase(cloneProfileArr);
       }, 2000);
+      saveDataToLS(cloneProfileArr);
       return {
         ...state,
         notAllowEdit: /profile[1-4]/.test(newActiveItem.id) ? true : false,
@@ -63,8 +65,8 @@ const reducer = (state = profileListState, action) => {
       };
 
     case ADD_PROFILE_ITEM:
-      var timestamp = new Date().getUTCMilliseconds(); // dummy div id
-      var newProfileArr = [...state.profileArr];
+      var timestamp = new Date().getMilliseconds(); // dummy div id
+      var newProfileArr = [...arrLS];
       newProfileArr.forEach(e => {
         if (e.class.includes('active')) {
           e.class = e.class.replace('active', '').trim();
@@ -83,7 +85,7 @@ const reducer = (state = profileListState, action) => {
         saveDataToLS(newProfileArr);
         addDataToFireBase(newProfileArr);
       }, 2000);
-
+      saveDataToLS(newProfileArr);
       return {
         ...state,
         isUp: true,
@@ -95,7 +97,7 @@ const reducer = (state = profileListState, action) => {
       };
 
     case UP_PROFILE_ITEM:
-      var updatedProfileArrAfterUp = [...state.profileArr];
+      var updatedProfileArrAfterUp = [...arrLS];
       let oldPosition = updatedProfileArrAfterUp.findIndex(element =>
         element.class.includes('active')
       );
@@ -122,7 +124,7 @@ const reducer = (state = profileListState, action) => {
         saveDataToLS(updatedProfileArrAfterUp);
         addDataToFireBase(updatedProfileArrAfterUp);
       }, 2000);
-
+      saveDataToLS(updatedProfileArrAfterUp);
       return {
         ...state,
         notAllowEdit: state.notAllowEdit,
@@ -133,11 +135,11 @@ const reducer = (state = profileListState, action) => {
         isDown:
           newPosition < updatedProfileArrAfterUp.length - 1 ? true : false,
         profileArr: [...updatedProfileArrAfterUp],
-        height: newPosition * 30,
+        height: (newPosition < 0 ? 0 : newPosition) * 30,
       };
 
     case DOWN_PROFILE_ITEM:
-      var updatedProfileArrAfterDown = [...state.profileArr];
+      var updatedProfileArrAfterDown = [...arrLS];
       let oldPos = updatedProfileArrAfterDown.findIndex(element =>
         element.class.includes('active')
       );
@@ -164,7 +166,7 @@ const reducer = (state = profileListState, action) => {
         saveDataToLS(updatedProfileArrAfterDown);
         addDataToFireBase(updatedProfileArrAfterDown);
       }, 2000);
-
+      saveDataToLS(updatedProfileArrAfterDown);
       return {
         ...state,
         notAllowEdit: state.notAllowEdit,
@@ -190,18 +192,18 @@ const reducer = (state = profileListState, action) => {
       return { ...state, openEditPopup: false };
 
     case DELETE_PROFILE_ITEM:
-      let lists = [...state.profileArr];
+      let lists = [...arrLS];
       let found = lists.findIndex(element => element.class.includes('active'));
       if (found === 0) lists[found - 1] = lists[found + 1];
       lists[found - 1].class = lists[found - 1].class + ' active';
 
       lists.splice(found, 1);
-
+      clearTimeout(t);
       t = setTimeout(() => {
         saveDataToLS(lists);
         addDataToFireBase(lists);
       }, 2000);
-
+      saveDataToLS(lists);
       return {
         ...state,
         profileArr: [...lists],
@@ -210,14 +212,14 @@ const reducer = (state = profileListState, action) => {
         selectedItemContent: capitalizeFirstLetterEachWord(
           lists[found - 1].name
         ),
-        height: (found - 1) * 30,
+        height: (found - 1 < 0 ? 0 : found - 1) * 30,
       };
 
     case RENAME_ONCHANGE:
       return { ...state, selectedItemContent: action.content };
 
     case RENAME_HANDLER:
-      var updatedProfileArrAfterRename = [...state.profileArr];
+      var updatedProfileArrAfterRename = [...arrLS];
       let element = updatedProfileArrAfterRename.find(element =>
         element.class.includes('active')
       );
@@ -231,15 +233,15 @@ const reducer = (state = profileListState, action) => {
       };
 
       updatedProfileArrAfterRename.splice(position, 1, newELement);
-
+      clearTimeout(t);
       t = setTimeout(() => {
         saveDataToLS(updatedProfileArrAfterRename);
         addDataToFireBase(updatedProfileArrAfterRename);
       }, 2000);
-
+      saveDataToLS(updatedProfileArrAfterRename);
       return {
         ...state,
-        selectedItemContent: capitalizeFirstLetterEachWord(action.content),
+        selectedItemContent: action.content,
         profileArr: [...updatedProfileArrAfterRename],
         height: position * 30,
       };

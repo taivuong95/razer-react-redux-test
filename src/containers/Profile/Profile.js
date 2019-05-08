@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ProfileItem from '../ProfileItem/ProfileItem';
 import { getDataFromLS } from '../../services/localStorage';
+import { autoSave } from '../../utils/fnUtil';
 let profileList = React.createRef();
 class Profile extends Component {
   // textInput must be declared here so the ref can refer to it
@@ -134,12 +135,16 @@ class Profile extends Component {
             <div
               className={this.props.isDown ? 'icon down' : 'icon down disabled'}
               id="profileDown"
-              onClick={() => this.props.downProfileItem()}
+              onClick={() => {
+                this.props.downProfileItem();
+              }}
             />
             <div
               className={this.props.isUp ? 'icon up' : 'icon up disabled'}
               id="profileUp"
-              onClick={() => this.props.upProfileItem()}
+              onClick={() => {
+                this.props.upProfileItem();
+              }}
             />
           </div>
           <div
