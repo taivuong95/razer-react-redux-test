@@ -4,7 +4,7 @@ import ProfileItem from '../ProfileItem/ProfileItem';
 import { getDataFromLS } from '../../services/localStorage';
 import { autoSave } from '../../utils/fnUtil';
 let profileList = React.createRef();
-class Profile extends Component {
+export class Profile extends Component {
   // textInput must be declared here so the ref can refer to it
 
   constructor(props) {
@@ -180,7 +180,7 @@ class Profile extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state, ownProps) => {
   return {
     dulieu: state.profileArr,
     isUp: state.isUp,
@@ -193,7 +193,7 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+export const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     addProfileItem: () => {
       dispatch({

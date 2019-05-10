@@ -20,7 +20,8 @@ import { saveDataToLS, getDataFromLS } from '../services/localStorage';
 import { addDataToFireBase } from '../services/firebaseConnect';
 
 const reducer = (state = profileListState, action) => {
-  var arrLS = getDataFromLS();
+  // var arrLS = getDataFromLS();
+  var arrLS = [...state.profileArr];
   var t;
   switch (action.type) {
     case CHANGE_PROFILE_ITEM:

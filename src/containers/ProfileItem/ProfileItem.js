@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-class ProfileItem extends Component {
+export class ProfileItem extends Component {
   render() {
     return (
       <div
@@ -16,13 +16,13 @@ class ProfileItem extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state, ownProps) => {
   return {
     dulieu: state.profileArr,
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+export const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     changeProfileItem: (selectedItemContent, content) => {
       dispatch({
